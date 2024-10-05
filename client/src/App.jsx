@@ -14,6 +14,7 @@ function App() {
         >
           Learn React
         </a>
+        <p className="text-center text-bold mt-4">GOOBER</p>
       </header>
     </div>
   )
