@@ -1,4 +1,4 @@
 #!/bin/bash
 
-createdb goober
-psql -d goober -f ./schema.sql
+createdb -O postgres goober
+psql -U postgres -d goober -f ./schema.sql
