@@ -11,6 +11,7 @@ import { setupOpenAI, sendInvites } from './invite.js';
 setupOpenAI();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(logger('dev'));
 const PORT = 8000;
@@ -33,6 +34,46 @@ app.get('/api/', async (req, res) => {
 
 app.get('/api/auth_check', authenticate, async (req, res) => {
   res.status(200).send("Authorized");
+});
+
+
+// POST /api/register
+app.post('/api/register', async (req, res) => {
+  const { id, name, description, password } = req.body;
+
+  if (!id || !name || !description || !password) {
+    return res.status(400).send('All fields are required.');
+  }
+
+  const result = await db.registerUser({ id, name, description, password });
+
+  if (result.success) {
+    res.status(201).send({ message: 'User registered successfully!' });
+  } else {
+    res.status(500).send({ message: 'Registration failed.', error: result.message });
+  }
+});
+
+// POST /api/login
+app.post('/api/login', async (req, res) => {
+  const { userId, password } = req.body;
+
+  if (!userId || !password) {
+    return res.status(400).json({ message: 'Please provide both user ID and password.' });
+  }
+
+  try {
+    const isValid = await db.verifyLogin(userId, password);
+    
+    if (isValid) {
+      return res.status(200).json({ message: 'Login successful!' });
+    } else {
+      return res.status(401).json({ message: 'Invalid ID or password.' });
+    }
+  } catch (error) {
+    console.error('Error verifying login:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
 });
 
 // GET /api/invite?user=user_id&pwd=password&amount=amnt&event=event_id

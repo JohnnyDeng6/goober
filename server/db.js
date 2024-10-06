@@ -99,3 +99,14 @@ export async function insertEvent(description, hostId, time) {
     console.log('insertevent: ' + err.toString());
   }
 }
+
+export async function registerUser({ id, name, description, password }) {
+  try {
+    const insertQuery = `INSERT INTO users(id, name, description, password) VALUES ($1, $2, $3, $4)`;
+    await client.query(insertQuery, [id, name, description, password]);
+    return { success: true };
+  } catch (error) {
+    console.error('Error in registerUser:', error);
+    return { success: false, message: error.toString() };
+  }
+}
