@@ -34,3 +34,11 @@ app.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);
 })
 
+app.post('/send_invitations/:userid', async (req, res) => {
+  const { userid } = req.param;
+
+  
+
+  res.send
+
+})

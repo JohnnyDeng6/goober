@@ -76,3 +76,19 @@ export async function numPossibleInvites(eventId) {
     return 0;
   }
 }
+
+export async function getAllInvitations(userId) { 
+  try {
+    let res;
+
+    res = await client.query(
+      "SELECT * FROM invitations WHERE user_id == '$1"
+      [userId]
+    );
+    console.log(res);
+    return res;
+  }  catch (err) {
+    console.log("Couldn't get Invitations from database");
+    return undefined;
+  }
+}
