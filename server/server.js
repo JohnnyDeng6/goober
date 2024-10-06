@@ -5,12 +5,13 @@ import logger from 'morgan';
 import dotenv from 'dotenv';
 dotenv.config(); // copies env vars in .env into process.env
 
-import { verifyLogin, selectUser } from './db.js';
+import { verifyLogin, selectUser, getAllInvitations } from './db.js';
 import { setupOpenAI, sendInvites } from './invite.js';
 
 setupOpenAI();
 
 const app = express();
+app.use(cors());
 const PORT = 8000;
 
 async function authenticate(req, res, next) {
@@ -51,11 +52,13 @@ app.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);
 })
 
-app.post('/send_invitations/:userid', async (req, res) => {
-  const { userid } = req.param;
-
-  
-
-  res.send
-
+// GET /api/send_invitations?user=user_id
+app.get('/api/get_invitations', authenticate, async (req, res) => {
+    try {
+      const user = req.query.user; 
+      const invitations = await getAllInvitations(user);
+      res.send(invitations)
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
 })
