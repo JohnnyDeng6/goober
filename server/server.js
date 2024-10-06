@@ -12,6 +12,7 @@ setupOpenAI();
 
 const app = express();
 app.use(express.json());
+app.use(logger('dev'));
 const PORT = 8000;
 
 async function authenticate(req, res, next) {
@@ -26,11 +27,13 @@ async function authenticate(req, res, next) {
   }
 }
 
-app.use(logger('dev'));
-
 app.get('/api/', async (req, res) => {
   res.send("Goober API");
 })
+
+app.get('/api/auth_check', authenticate, async (req, res) => {
+  res.status(200).send("Authorized");
+});
 
 // GET /api/invite?user=user_id&pwd=password&amount=amnt&event=event_id
 app.get('/api/invite', authenticate, async (req, res) => {
