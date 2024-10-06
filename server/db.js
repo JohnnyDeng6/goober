@@ -16,23 +16,34 @@ try {
   console.log('DB connection not working');
 }
 
-export async function getRandomUser(dontMatchUsername) {
+export async function verifyLogin(userId, password) {
   try {
-    let res;
+    const res = await client.query(
+      "SELECT * FROM users WHERE id = $1 AND password = $2",
+      [userId, password]
+    );
 
-    if (dontMatchUsername) {
-      res = await client.query(
-        "SELECT id, name, description FROM users WHERE id != $1 ORDER BY RANDOM() LIMIT 1",
-        [dontMatchUsername]
-      );
-    } else {
-      res = await client.query("SELECT id, name, description FROM users ORDER BY RANDOM() LIMIT 1");
-    }
-
-    // { id: .., name: .., description: .. }
-    return res.rows[0];
+    return res.rows.length === 1; // will be 0 if pwd is wrong
   } catch (err) {
-    console.log("Couldn't get random user: " + err.toString());
+    return false;
+  }
+}
+
+export async function getInvitableUsers(hostId, numUsers, eventId) {
+  try {
+    const res = await client.query(
+      "SELECT id, name, description FROM users u " +
+      "WHERE id != $1 AND NOT EXISTS (" +
+      "  SELECT * FROM invitations" +
+      "  WHERE user_id = u.id AND event_id = $2" +
+      ") ORDER BY RANDOM() LIMIT $3",
+      [hostId, eventId, numUsers]
+    );
+
+    // [{ id: .., name: .., description: .. }, ..]
+    return res.rows;
+  } catch (err) {
+    console.log("Couldn't get random users: " + err.toString());
   }
 }
 
@@ -42,38 +53,21 @@ export async function insertInvitation(userId, eventId, confirmed) {
       "INSERT INTO invitations (user_id, event_id, confirmed, expires) VALUES ($1, $2, $3, $4)",
       [userId, eventId, confirmed, "Never"]
     );
+    return true;
   } catch (err) {
-    console.log("Couldn't insert invitation: " + err.toString());
-    throw new Error("Probably a foreign key collision");
+    //console.log("Couldn't insert invitation: " + err.toString());
+    return false;
   }
 }
 
-export async function isOKToInvite(userId, eventId) {
+export async function selectUser(userId) {
   try {
-    const res = await client.query(
-      "SELECT * FROM invitations WHERE user_id = $1 AND event_id = $2",
-      [userId, eventId]
-    );
+    const res = await client.query("SELECT * FROM users WHERE id = $1", [userId]);
 
-    return res.rows.length;
+    return res.rows[0];
   } catch (err) {
-    return 0;
-  }
-}
-
-export async function numPossibleInvites(eventId) {
-  try {
-    const res = await client.query(
-      "SELECT count(*) - (" +
-      "  SELECT count(*) FROM invitations WHERE event_id = $1" +
-      ") AS num FROM users",
-      [eventId]
-    );
-
-    return res.rows[0].num;
-  } catch (err) {
-    console.log(err.toString());
-    return 0;
+    console.log("Fail: " + err.toString());
+    return {};
   }
 }
 
