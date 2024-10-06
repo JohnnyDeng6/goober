@@ -1,37 +1,35 @@
-CREATE EXTENSION pgcrypto;
-
 CREATE TABLE users (
     id varchar(32) PRIMARY KEY,
     name varchar(32) NOT NULL,
     description varchar(280) NOT NULL,
-    hashed_password bytea NOT NULL
+    password varchar(64) NOT NULL
 );
 
 -- insert some users
 
-INSERT INTO users(id, name, description, hashed_password) VALUES (
+INSERT INTO users(id, name, description, password) VALUES (
     'micahdb',
     'Micah Baker',
     'A student that attends SFU and is studying Computing Science.',
-    sha256('1234')
+    '1234'
 );
-INSERT INTO users(id, name, description, hashed_password) VALUES (
+INSERT INTO users(id, name, description, password) VALUES (
     'bicwang',
     'Johnny Deng',
     'A student that attends SFU and is studying Computing Science.',
-    sha256('1234')
+    '1234'
 );
-INSERT INTO users(id, name, description, hashed_password) VALUES (
+INSERT INTO users(id, name, description, password) VALUES (
     'nakulbansal727',
     'Nakul Bansal',
     'A student that attends SFU and is studying Computing Science.',
-    sha256('1234')
+    '1234'
 );
-INSERT INTO users(id, name, description, hashed_password) VALUES (
+INSERT INTO users(id, name, description, password) VALUES (
     'simon',
     'Simon Purdon',
     'A student that attends SFU and is studying Computing Science.',
-    sha256('1234')
+    '1234'
 );
 
 CREATE TABLE events (
