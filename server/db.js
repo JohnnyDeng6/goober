@@ -76,13 +76,26 @@ export async function getAllInvitations(userId) {
     let res;
 
     res = await client.query(
-      "SELECT * FROM invitations WHERE user_id == '$1"
+      "SELECT * FROM invitations WHERE user_id = '$1"
       [userId]
     );
     console.log(res);
     return res;
-  }  catch (err) {
+  } catch (err) {
     console.log("Couldn't get Invitations from database");
     return undefined;
+  }
+}
+
+export async function insertEvent(description, hostId, time) {
+  try {
+    const res = await client.query(
+      "INSERT INTO events(description, host_id, time) VALUES ($1, $2, $3) RETURNING id",
+      [description, hostId, time]
+    );
+
+    return res.rows[0].id;
+  } catch (err) {
+    console.log('insertevent: ' + err.toString());
   }
 }
