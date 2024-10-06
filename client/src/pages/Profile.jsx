@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Header, Footer } from '../components/index.js'
-import { mockUser } from './mockData.js'
 
 export function Profile() {
   const [userData, setUserData] = useState(mockUser)
