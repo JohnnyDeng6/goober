@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 
-import { isOKToInvite, getRandomUser, insertInvitation, numPossibleInvites } from './db.js';
+import { getInvitableUsers, insertInvitation } from './db.js';
 
 let client;
 
@@ -10,37 +10,35 @@ export async function setupOpenAI() {
   });
 }
 
-export async function sendInvites(hostUser, numMatches, eventId) {
+export async function sendInvites(hostUser, numInvites, eventId) {
   try {
-    try {
-      await insertInvitation(hostUser.id, eventId, 't');
-
-      const numPossibleMatches = await numPossibleInvites(eventId);
-
-      if (numPossibleMatches < numMatches) {
-        console.log("Less people available than attempting to invite: " + numPossibleMatches.toString());
-        numMatches = numPossibleMatches;
-      }
-    } catch (err) {
-      // pass
+    if (numInvites < 1) {
+      return [];
     }
 
-    let matchedUsers = [];
+    let randomUsers = [];
 
-    while (matchedUsers.length < numMatches) {
-      const randomUser = await getRandomUser(hostUser.name);
+    try {
+      await insertInvitation(hostUser.id, eventId, 't'); // host is auto invited & confirmed attending
+      randomUsers = await getInvitableUsers(hostUser.id, numInvites, eventId);
+    } catch (err) {
+      console.log("HELP " + err.toString());
+      return [];
+    }
 
-      if (!randomUser || !isOKToInvite(randomUser.id, eventId)) {
-        continue;
-      }
+    // randomUsers is array of <numInvites users
 
+    const matchedUsers = [];
+
+    for (const user of randomUsers) {
+      // query OpenAI checking for compatibility
       const chatCompletion = await client.chat.completions.create({
         messages: [{
           role: 'user',
           content: 'Given someone has the description "'
             + hostUser.description
             + '" and someone else with the description "'
-            + randomUser.description
+            + user.description
             + '" would you say that these people "match"? Reply "Yes." or "No".'
         }],
         model: 'gpt-3.5-turbo',
@@ -48,18 +46,21 @@ export async function sendInvites(hostUser, numMatches, eventId) {
 
       if (chatCompletion.choices[0].message.content === "Yes.") {
         try {
-          await insertInvitation(randomUser.id, eventId, 'f');
-          matchedUsers.push(randomUser);
+          await insertInvitation(user.id, eventId, 'f');
+          matchedUsers.push(user);
         } catch (err) {
-          // pass
+          console.log("err at thingy: " + err.toString());
         }
-      } else {
-        // pass
       }
     }
 
-    return matchedUsers;
+    if (randomUsers.length > 0) {
+      const nextMatches = await sendInvites(hostUser, numInvites - matchedUsers.length, eventId);
+      return [...matchedUsers, ...nextMatches];
+    }
   } catch (err) {
     console.log("Error in sendInvites: " + err.toString());
   }
+
+  return [];
 }
