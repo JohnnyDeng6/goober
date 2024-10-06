@@ -16,4 +16,23 @@ try {
   console.log('DB connection not working');
 }
 
-export { client };
+export async function getRandomUser(dontMatchUsername) {
+  try {
+    let res;
+
+    if (dontMatchUsername) {
+      res = await client.query(
+        "SELECT id, name, description FROM users WHERE username != '$1' ORDER BY RANDOM() LIMIT 1",
+        [dontMatchUsername]
+      );
+    } else {
+      res = await client.query("SELECT id, name, description FROM users ORDER BY RANDOM() LIMIT 1");
+    }
+
+    // { id: .., name: .., description: .. }
+    return res.rows[0];
+  } catch (err) {
+    console.log("Couldn't get random user from database");
+    return undefined;
+  }
+}
