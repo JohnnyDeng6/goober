@@ -22,7 +22,7 @@ export async function getRandomUser(dontMatchUsername) {
 
     if (dontMatchUsername) {
       res = await client.query(
-        "SELECT id, name, description FROM users WHERE username != '$1' ORDER BY RANDOM() LIMIT 1",
+        "SELECT id, name, description FROM users WHERE id != $1 ORDER BY RANDOM() LIMIT 1",
         [dontMatchUsername]
       );
     } else {
@@ -32,7 +32,47 @@ export async function getRandomUser(dontMatchUsername) {
     // { id: .., name: .., description: .. }
     return res.rows[0];
   } catch (err) {
-    console.log("Couldn't get random user from database");
-    return undefined;
+    console.log("Couldn't get random user: " + err.toString());
+  }
+}
+
+export async function insertInvitation(userId, eventId, confirmed) {
+  try {
+    const res = await client.query(
+      "INSERT INTO invitations (user_id, event_id, confirmed, expires) VALUES ($1, $2, $3, $4)",
+      [userId, eventId, confirmed, "Never"]
+    );
+  } catch (err) {
+    console.log("Couldn't insert invitation: " + err.toString());
+    throw new Error("Probably a foreign key collision");
+  }
+}
+
+export async function isOKToInvite(userId, eventId) {
+  try {
+    const res = await client.query(
+      "SELECT * FROM invitations WHERE user_id = $1 AND event_id = $2",
+      [userId, eventId]
+    );
+
+    return res.rows.length;
+  } catch (err) {
+    return 0;
+  }
+}
+
+export async function numPossibleInvites(eventId) {
+  try {
+    const res = await client.query(
+      "SELECT count(*) - (" +
+      "  SELECT count(*) FROM invitations WHERE event_id = $1" +
+      ") AS num FROM users",
+      [eventId]
+    );
+
+    return res.rows[0].num;
+  } catch (err) {
+    console.log(err.toString());
+    return 0;
   }
 }

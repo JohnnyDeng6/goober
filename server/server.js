@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config(); // copies env vars in .env into process.env
 
 import { getRandomUser } from './db.js';
-import { setupOpenAI, matchUser } from './match.js';
+import { setupOpenAI, sendInvites } from './invite.js';
 
 setupOpenAI();
 
@@ -22,7 +22,12 @@ app.get('/', async (req, res) => {
 app.get('/match', async (req, res) => {
   const firstUser = await getRandomUser();
 
-  await matchUser(firstUser);
+  console.log('1');
+  const matchedUsers = await sendInvites(firstUser, 2, 1);
+
+  console.log('1');
+
+  res.send(matchedUsers);
 });
 
 app.listen(PORT, () => {
