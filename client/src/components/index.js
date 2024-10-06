@@ -1,2 +1,2 @@
-export * from './Header.js'
-export * from './Footer.js'
+export * from './Header.jsx'
+export * from './Footer.jsx'
