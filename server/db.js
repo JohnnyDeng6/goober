@@ -109,3 +109,16 @@ export async function registerUser({ id, name, description, password }) {
     return { success: false, message: error.toString() };
   }
 }
+
+export async function updateProfile(user_id, {name, description, password}) {
+  try {
+    await client.query(
+      "UPDATE users SET name = $1, description = $2, password = $3 WHERE id = $4",
+      [name, description, password, user_id]);
+    return { success: true };
+  } catch (error) {
+    console.error('Error in updateProfile:', error);
+    return { success: false, message: error.toString() };
+
+  } 
+}

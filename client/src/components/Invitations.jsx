@@ -9,11 +9,11 @@ export function Invitations() {
     }
 
     return (
-        <div className="space-y-4 p-4">
+        <div className="space-y-4 p-4 mt-16 mb-16">
           {invitations.map((invitation) => (
             <div
               key={invitation.event_id}
-              className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
+              className="bg-white shadow-md rounded-lg p-5 border border-gray-250"
             >
               <div className="flex justify-between mb-2">
                 <span className="font-semibold">Event ID:</span>
@@ -50,12 +50,13 @@ export function Invitations() {
     function handleAccept(event_id) {
         // Logic to accept the invitation
         console.log(`Accepted invitation with ID: ${event_id}`);
-        // Optionally navigate or update state after accepting
+        // if accepted, make post to attendees table
+        // remove from invitation list
     }
 
     function handleReject(event_id) {
         // Logic to reject the invitation
         console.log(`Rejected invitation with ID: ${event_id}`);
-        // Optionally navigate or update state after rejecting
+        // remove from invitation list
     }
 }

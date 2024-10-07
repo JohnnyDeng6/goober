@@ -139,13 +139,36 @@ app.get('/api/get_invitations/:user_id', async (req, res) => {
     }
 })
 
-// // GET /api/send_invitations?user=user_id
-// app.get('/api/get_invitations/:id', async (req, res) => {
-//     try {
-//       const user = req.param['id']; 
-//       const invitations = await getAllInvitations(user);
-//       res.send(invitations)
-//     } catch (err) {
-//       res.status(500).send(err.toString());
-//     }
-// })
+app.get('/api/get_userdata/:user_id', async (req, res) => {
+    try {
+      const user_id = req.params['user_id'];
+      console.log(user_id)
+
+      const userData = await db.selectUser(user_id)
+
+      // [{ id: .., name: .., desciption: .., password: .. }]
+      console.log(userData)
+      res.send(userData)
+
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
+})
+// const apiUrl = process.env.REACT_APP_BACKEND_API + '/api/edit_user/' + user.id;
+app.put('/api/edit_user/:user_id', async (req, res) => {
+  try {
+    const { name, description, password } = req.body;
+    const user_id = req.params['user_id'];
+
+    if (!name || !description || !password) {
+      return res.status(400).send('All fields are required.');
+    }
+
+    await db.updateProfile(user_id, { name, description, password});
+
+  } catch (err) {
+      console.log("server:")
+      res.status(500).send(err.toString());
+  }
+
+})
