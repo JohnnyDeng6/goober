@@ -121,3 +121,31 @@ app.post('/api/create_event', authenticate, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);
 })
+
+
+// GET /api/send_invitations?user=user_id
+app.get('/api/get_invitations/:user_id', async (req, res) => {
+    try {
+      const user_id = req.params['user_id'];
+      console.log(user_id)
+
+      const invitations = await db.getAllInvitations(user_id)
+
+      // [{ id: .., event_id: .., confirmed: .., expires: .. },[..]]
+      res.send(invitations)
+
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
+})
+
+// // GET /api/send_invitations?user=user_id
+// app.get('/api/get_invitations/:id', async (req, res) => {
+//     try {
+//       const user = req.param['id']; 
+//       const invitations = await getAllInvitations(user);
+//       res.send(invitations)
+//     } catch (err) {
+//       res.status(500).send(err.toString());
+//     }
+// })

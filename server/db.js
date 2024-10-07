@@ -1,11 +1,15 @@
 import pg from 'pg';
 const { Client } = pg;
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 const client = new Client({
-  user: 'postgres',
+  user: process.env.PSQL_USR,
   host: 'localhost',
   port: '5432',
-  database: 'goober'
+  database: 'goober',
+  password: process.env.PSQL_PW
 });
 await client.connect();
 
@@ -73,15 +77,10 @@ export async function selectUser(userId) {
 
 export async function getAllInvitations(userId) { 
   try {
-    let res;
-
-    res = await client.query(
-      "SELECT * FROM invitations WHERE user_id = '$1"
-      [userId]
-    );
-    console.log(res);
-    return res;
-  } catch (err) {
+    const res = await client.query("SELECT * FROM invitations WHERE user_id = $1;", [userId]);
+    console.log(res.rows)
+    return res.rows;
+  }  catch (err) {
     console.log("Couldn't get Invitations from database");
     return undefined;
   }
