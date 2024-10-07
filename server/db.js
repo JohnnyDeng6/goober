@@ -1,12 +1,15 @@
 import pg from 'pg';
 const { Client } = pg;
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 const client = new Client({
-  user: 'ogre',
+  user: process.env.PSQL_USR,
   host: 'localhost',
   port: '5432',
   database: 'goober',
-  password: 'ogre'
+  password: process.env.PSQL_PW
 });
 await client.connect();
 
@@ -74,13 +77,35 @@ export async function selectUser(userId) {
 
 export async function getAllInvitations(userId) { 
   try {
-    const res = await client.query(
-      "SELECT * FROM invitations WHERE user_id = $1",
-      [userId]
-    );
+    const res = await client.query("SELECT * FROM invitations WHERE user_id = $1;", [userId]);
+    console.log(res.rows)
     return res.rows;
   }  catch (err) {
     console.log("Couldn't get Invitations from database");
     return undefined;
+  }
+}
+
+export async function insertEvent(description, hostId, time) {
+  try {
+    const res = await client.query(
+      "INSERT INTO events(description, host_id, time) VALUES ($1, $2, $3) RETURNING id",
+      [description, hostId, time]
+    );
+
+    return res.rows[0].id;
+  } catch (err) {
+    console.log('insertevent: ' + err.toString());
+  }
+}
+
+export async function registerUser({ id, name, description, password }) {
+  try {
+    const insertQuery = `INSERT INTO users(id, name, description, password) VALUES ($1, $2, $3, $4)`;
+    await client.query(insertQuery, [id, name, description, password]);
+    return { success: true };
+  } catch (error) {
+    console.error('Error in registerUser:', error);
+    return { success: false, message: error.toString() };
   }
 }

@@ -18,7 +18,6 @@ export function Main() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/create-event" element={<CreateEvent />} />
-      <Route path="/invitations" element={<Invitations />} />
       <Route path="/schedule" element={<Schedule />} />
       <Route path="/profile" element={<Profile />} />
     </Routes>

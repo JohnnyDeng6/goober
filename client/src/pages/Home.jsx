@@ -9,10 +9,9 @@ export function Home() {
       </header>
 
       <main className="flex-grow flex items-center justify-center">
-        <p className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold p-4">
+        <span className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold p-4">
           <Invitations />
-          LETS GOOOOO
-        </p>
+        </span>
       </main>
 
       <footer className="mt-auto">
