@@ -26,7 +26,7 @@ export function useUser() {
                 }
 
                 const data = await response.json();
-                console.log(data);
+                console.log("calling");
                 setUserData(data); 
 
             } catch (err) {

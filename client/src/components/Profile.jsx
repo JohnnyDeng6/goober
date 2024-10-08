@@ -5,20 +5,39 @@ import { Cookies } from 'react-cookie';
 
 export function Profile() {
     const { userData, error } = useUser();
-    const [newUserData, setNewUserData] = useState(userData || { name: '', description: '', password: '' });
+    const [UserData, setUserData] = useState({});
+    const [newUserData, setNewUserData] = useState({});
+    const [saved, setSaved] = useState(true);
 
     const cookies = new Cookies(); 
     const user = cookies.get('user');
 
     useEffect(() => {
         if (userData) {
-            setNewUserData({
+            setUserData({
+                id: userData.id,
                 name: userData.name || '',
                 description: userData.description || '',
-                password: '' // Password is left empty for security
+                password: userData.password || ''
             });
         }
-    }, [userData]);
+    }, []);
+    
+    useEffect(() => {
+        if (UserData) {
+            setNewUserData({
+                id: UserData.id,
+                name: UserData.name || '',
+                description: UserData.description || '',
+                password: UserData.password || ''
+            });
+        }
+    }, [UserData]);
+
+    useEffect(() => {
+        setSaved(JSON.stringify(UserData) === JSON.stringify(newUserData) ? true : false)
+        console.log(saved)
+    })
 
     if (error) {
         return <div>Error fetching Profile: {error.message}</div>;
@@ -32,15 +51,17 @@ export function Profile() {
         }));
     };
 
+    
+
     const handleSave = async (e) => {
         e.preventDefault();
-        console.log(newUserData)
+        setUserData({
+            id: newUserData.id,
+            name: newUserData.name,
+            description: newUserData.description,
+            password: newUserData.password
+        });
 
-        // if not set
-        newUserData.name = newUserData.name !== '' ? newUserData.name : userData.name;
-        newUserData.description = newUserData.description !== '' ? newUserData.description : userData.description;
-        newUserData.password = newUserData.password !== '' ? newUserData.password : userData.password;
-        console.log(newUserData)
 
         try {
             const apiUrl = process.env.REACT_APP_BACKEND_API + '/api/edit_user/' + user.id;
@@ -52,13 +73,6 @@ export function Profile() {
                 body: JSON.stringify(newUserData),
             });
 
-
-            if (response.ok) {
-                setCookie('user', JSON.stringify(newUserData), { path: '/', maxAge: 3600 });
-                alert('Profile set successful!');
-            } else {
-                alert('failed to set profile');
-            }
         } catch (error) {
             console.error('Error', error);
         }
@@ -75,6 +89,7 @@ export function Profile() {
                 name="name"
                 placeholder="Name"
                 value={newUserData.name || ""} 
+                required
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 onChange={handleChange}
             />
@@ -86,6 +101,7 @@ export function Profile() {
                 name="description" 
                 placeholder="Description"
                 value={newUserData.description || ""}
+                required
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-y"
                 onChange={handleChange}
             />
@@ -98,6 +114,7 @@ export function Profile() {
                 name="password" 
                 placeholder="Password"
                 value={newUserData.password || ""}
+                required
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 onChange={handleChange}
             />
@@ -105,9 +122,11 @@ export function Profile() {
 
             <button
             type="submit"
-            className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+            className={`w-full font-bold py-2 px-4 rounded-lg transition duration-200 ${
+                saved ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
+            }`}
             >
-            Save
+                {saved ? 'Saved' : 'Save'}
             </button>
         </form>
         </div>
