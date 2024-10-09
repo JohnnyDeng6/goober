@@ -10,6 +10,7 @@ export async function setupOpenAI() {
   });
 }
 
+//recursivly sends invitations until matched
 export async function sendInvites(hostUser, numInvites, eventId) {
   try {
     if (numInvites < 1) {
@@ -26,7 +27,7 @@ export async function sendInvites(hostUser, numInvites, eventId) {
       return [];
     }
 
-    // randomUsers is array of <numInvites users
+    // randomUsers is array of numInvites users
 
     const matchedUsers = [];
 
@@ -51,7 +52,7 @@ export async function sendInvites(hostUser, numInvites, eventId) {
         } catch (err) {
           console.log("err at thingy: " + err.toString());
         }
-      }
+      } else {console.log("chat said no :(")}
     }
 
     if (randomUsers.length > 0) {

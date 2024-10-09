@@ -24,8 +24,8 @@ export function Invitations() {
                 <span>{invitation.confirmed ? 'Yes' : 'No'}</span>
               </div>
               <div className="flex justify-between mb-4">
-                <span className="font-semibold">Event ID:</span>
-                <span>{invitation.event_id}</span>
+                <span className="font-semibold mx-1">Expires:</span>
+                <span>{invitation.expires}</span>
               </div>
               <div className="flex space-x-2">
                 <button

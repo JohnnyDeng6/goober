@@ -51,6 +51,7 @@ export async function getInvitableUsers(hostId, numUsers, eventId) {
   }
 }
 
+//sends invitation to a single user
 export async function insertInvitation(userId, eventId, confirmed) {
   try {
     const res = await client.query(
@@ -59,7 +60,7 @@ export async function insertInvitation(userId, eventId, confirmed) {
     );
     return true;
   } catch (err) {
-    //console.log("Couldn't insert invitation: " + err.toString());
+    console.log("Couldn't insert invitation: " + err.toString());
     return false;
   }
 }
@@ -86,11 +87,12 @@ export async function getAllInvitations(userId) {
   }
 }
 
-export async function insertEvent(description, hostId, time) {
+//makes new event given all params, returns id of event
+export async function insertEvent(description, hostId, time, attendees, attendees_found) {
   try {
     const res = await client.query(
-      "INSERT INTO events(description, host_id, time) VALUES ($1, $2, $3) RETURNING id",
-      [description, hostId, time]
+      "INSERT INTO events(description, host_id, time, attendees, attendees_found) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+      [description, hostId, time, attendees, attendees_found]
     );
 
     return res.rows[0].id;
@@ -121,4 +123,15 @@ export async function updateProfile(user_id, {name, description, password}) {
     return { success: false, message: error.toString() };
 
   } 
+}
+
+export async function getAllEvents(userId) { 
+  try {
+    const res = await client.query("SELECT * FROM events WHERE host_id = $1;", [userId]);
+    console.log(res.rows)
+    return res.rows;
+  }  catch (err) {
+    console.log("Couldn't get Invitations from database");
+    return undefined;
+  }
 }

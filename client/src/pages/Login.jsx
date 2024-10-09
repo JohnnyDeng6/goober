@@ -27,7 +27,7 @@ export function Login() {
 
       if (response.ok) {
         const result = await response.json();
-        setCookie('user', JSON.stringify({ id }), { path: '/', maxAge: 3600 });
+        setCookie('user', JSON.stringify({ id, password }), { path: '/', maxAge: 3600 });
 
         alert('Login successful!');
         window.location.href = '/home'; 

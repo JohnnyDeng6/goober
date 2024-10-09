@@ -36,15 +36,19 @@ CREATE TABLE events (
     id SERIAL PRIMARY KEY,
     description varchar(280) NOT NULL,
     host_id varchar(32) REFERENCES users(id),
-    time varchar(256) NOT NULL
+    time varchar(256) NOT NULL,
+    attendees int,
+    attendees_found int
 );
 
 -- insert an event
 
-INSERT INTO events(description, host_id, time) VALUES (
+INSERT INTO events(description, host_id, time, attendees, attendees_found) VALUES (
     'SFU Surge Stormhacks hackathon for interested Computing Science students.',
     'micahdb',
-    'October 5th, 2024'
+    'October 5th, 2024',
+    '2',
+    '0'
 );
 
 CREATE TABLE invitations (

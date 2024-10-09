@@ -18,6 +18,8 @@ const PORT = 8000;
 
 async function authenticate(req, res, next) {
   try {
+      console.log(req.query.user)
+      console.log(req.query.pwd)
     if (await db.verifyLogin(req.query.user, req.query.pwd)) {
       next();
     } else {
@@ -103,16 +105,32 @@ app.post('/api/create_event', authenticate, async (req, res) => {
 
   const description = data.description;
   const time = data.time;
+  const attendees = data.attendees;
+  console.log(req)
+  console.log(req.query.user)
 
-  const eventId = await db.insertEvent(description, req.query.user, time);
+  const host = {
+    id: req.query.user,
+    description: description
+  }
+
+  const eventId = await db.insertEvent(description, host.id, time, attendees, 1);
 
   if (eventId) {
     res.status(200).send({
       id: eventId,
       host_id: req.query.user,
       description: description,
-      time: time
+      time: time,
+      attendees: attendees,
+      attendees_found: 1
     });
+
+
+    //send invites
+    const invitedUsers = await sendInvites(host, attendees, eventId);
+    // res.status(200).send(invitedUsers);
+
   } else {
     res.status(500).send("Failed");
   }
@@ -171,4 +189,18 @@ app.put('/api/edit_user/:user_id', async (req, res) => {
       res.status(500).send(err.toString());
   }
 
+})
+
+app.get('/api/get_events/:user_id', async (req, res) => {
+    try {
+      const user_id = req.params['user_id'];
+      console.log(user_id)
+
+      const events = await db.getAllEvents(user_id)
+
+      res.send(events)
+
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
 })

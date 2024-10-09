@@ -11,17 +11,18 @@ export function Profile() {
 
     const cookies = new Cookies(); 
     const user = cookies.get('user');
+    console.log(userData)
 
     useEffect(() => {
         if (userData) {
             setUserData({
                 id: userData.id,
-                name: userData.name || '',
-                description: userData.description || '',
-                password: userData.password || ''
+                name: userData.name,
+                description: userData.description,
+                password: userData.password
             });
         }
-    }, []);
+    }, [userData]);
     
     useEffect(() => {
         if (UserData) {
@@ -33,10 +34,12 @@ export function Profile() {
             });
         }
     }, [UserData]);
+    console.log(UserData)
+    console.log(newUserData)
 
     useEffect(() => {
         setSaved(JSON.stringify(UserData) === JSON.stringify(newUserData) ? true : false)
-        console.log(saved)
+        // console.log(saved)
     })
 
     if (error) {
