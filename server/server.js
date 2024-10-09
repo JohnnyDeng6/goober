@@ -103,16 +103,30 @@ app.post('/api/create_event', authenticate, async (req, res) => {
 
   const description = data.description;
   const time = data.time;
+  const attendees = data.attendees;
 
-  const eventId = await db.insertEvent(description, req.query.user, time);
+  const host = {
+    id: req.query.user,
+    description: description
+  }
+
+  const eventId = await db.insertEvent(description, host.id, time, attendees, 0);
 
   if (eventId) {
     res.status(200).send({
       id: eventId,
       host_id: req.query.user,
       description: description,
-      time: time
+      time: time,
+      attendees: attendees,
+      attendees_found: 1
     });
+
+
+    //send invites
+    const invitedUsers = await sendInvites(host, attendees, eventId);
+    // res.status(200).send(invitedUsers);
+
   } else {
     res.status(500).send("Failed");
   }
@@ -127,7 +141,6 @@ app.listen(PORT, () => {
 app.get('/api/get_invitations/:user_id', async (req, res) => {
     try {
       const user_id = req.params['user_id'];
-      console.log(user_id)
 
       const invitations = await db.getAllInvitations(user_id)
 
@@ -139,13 +152,94 @@ app.get('/api/get_invitations/:user_id', async (req, res) => {
     }
 })
 
-// // GET /api/send_invitations?user=user_id
-// app.get('/api/get_invitations/:id', async (req, res) => {
-//     try {
-//       const user = req.param['id']; 
-//       const invitations = await getAllInvitations(user);
-//       res.send(invitations)
-//     } catch (err) {
-//       res.status(500).send(err.toString());
-//     }
-// })
+app.get('/api/get_userdata/:user_id', async (req, res) => {
+    try {
+      const user_id = req.params['user_id'];
+
+      const userData = await db.selectUser(user_id)
+
+      // [{ id: .., name: .., desciption: .., password: .. }]
+      res.send(userData)
+
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
+})
+// const apiUrl = process.env.REACT_APP_BACKEND_API + '/api/edit_user/' + user.id;
+app.put('/api/edit_user/:user_id', async (req, res) => {
+  try {
+    const { name, description, password } = req.body;
+    const user_id = req.params['user_id'];
+
+    if (!name || !description || !password) {
+      return res.status(400).send('All fields are required.');
+    }
+
+    await db.updateProfile(user_id, { name, description, password});
+
+  } catch (err) {
+      console.log("server:")
+      res.status(500).send(err.toString());
+  }
+
+})
+
+app.get('/api/get_events/:user_id', async (req, res) => {
+    try {
+      const user_id = req.params['user_id'];
+
+      const events = await db.getAllEvents(user_id)
+
+      res.send(events)
+
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
+})
+
+app.get('/api/get_eventById/:event_id', async (req, res) => {
+    try {
+      const event_id = req.params['event_id'];
+
+      const events = await db.getEventById(event_id)
+
+      res.send(events)
+
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
+})
+
+// '/api/reject_invitation?user=user_id&pwd=password&event=event_id
+app.delete('/api/reject_invitation', authenticate, async (req, res) => {
+  try {
+    const eventId = req.query.event;
+    db.deleteInvitationByEventId(eventId, req.query.user);
+    const host = db.selectUser(req.query.user)
+    const invitedUsers = await sendInvites(host, 1, eventId);
+    //find another user
+
+  } catch (err) {
+      res.status(500).send(err.toString());
+  }
+})
+
+app.put('/api/accept_invitation', authenticate, async (req, res) => {
+  try {
+    const eventId = req.query.event;
+    db.acceptInvitationByEventId(eventId, req.query.user);
+
+  } catch (err) {
+      res.status(500).send(err.toString());
+  }
+})
+//'/api/cancel_event?user=' + user.id + "&pwd=" + user.password + "&event=" + eventid;
+app.delete('/api/cancel_event', authenticate, async (req, res) => {
+  try {
+    const eventId = req.query.event;
+    db.cancelEvent(eventId, req.query.user);
+
+  } catch (err) {
+      res.status(500).send(err.toString());
+  }
+})

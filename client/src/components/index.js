@@ -1,3 +1,6 @@
 export * from './Header.jsx'
 export * from './Footer.jsx'
 export * from './Invitations.jsx'
+export * from './Event.jsx'
+export * from './Profile.jsx'
+export * from './Schedule.jsx'

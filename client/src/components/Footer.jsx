@@ -1,45 +1,32 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export function Footer() {
-  const navigate = useNavigate()
+export function Footer({ handleClick }) {
 
   return (
     <div className="fixed bottom-0 w-full bg-slate-300">
       <div className="flex justify-around items-center p-2">
         <button
           className="text-center text-lg font-bold p-2 hover:bg-slate-400 rounded"
-          onClick={() => navigate('/register')}
-        >
-          Register
-        </button>
-        <button
-          className="text-center text-lg font-bold p-2 hover:bg-slate-400 rounded"
-          onClick={() => navigate('/login')}
-        >
-          Login
-        </button>
-        <button
-          className="text-center text-lg font-bold p-2 hover:bg-slate-400 rounded"
-          onClick={() => navigate('/invitations')}
+          onClick={handleClick}
         >
           Invitations
         </button>
         <button
           className="text-center text-lg font-bold p-2 hover:bg-slate-400 rounded"
-          onClick={() => navigate('/create-event')}
+          onClick={handleClick}
         >
-          Create Event
+          Event
         </button>
         <button
           className="text-center text-lg font-bold p-2 hover:bg-slate-400 rounded"
-          onClick={() => navigate('/schedule')}
+          onClick={handleClick}
         >
           Schedule
         </button>
         <button
           className="text-center text-lg font-bold p-2 hover:bg-slate-400 rounded"
-          onClick={() => navigate('/profile')}
+          onClick={handleClick}
         >
           Profile
         </button>

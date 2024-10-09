@@ -1,19 +1,19 @@
-// import exp from 'constants';
+
 import { useState, useEffect } from 'react';
 import { Cookies } from 'react-cookie';
 
-export function useInvitations() {
+//gets events
+export function useEvents() {
     const cookies = new Cookies();
     const user = cookies.get('user');
     
-    const [invitations, setInvitations] = useState([]); 
-    const [error, setError] = useState(null); 
-// app.get('/api/get_eventById/:event_id', async (req, res) => {
+    const [events, setEvents] = useState([]); 
+    const [error, setError] = useState(null); // State to hold any error messages
 
     useEffect(() => {
-        const fetchInvitations = async () => {
+        const fetchEvents = async () => { // Renamed the inner function to avoid naming conflicts
             try {
-                const apiUrl = process.env.REACT_APP_BACKEND_API + '/api/get_invitations/' + user.id;
+                const apiUrl = process.env.REACT_APP_BACKEND_API + '/api/get_events/' + user.id;
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
@@ -27,18 +27,18 @@ export function useInvitations() {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
 
-                const data = await response.json(); 
+                const data = await response.json(); // Parse the response data
                 console.log(data);
-                setInvitations(data); 
+                setEvents(data); 
 
             } catch (err) {
-                console.log("Could not fetch invitations", err);
+                console.log("Could not fetch events", err); // Log the error
                 setError(err.message);
             }
         };
 
-        fetchInvitations(); 
-    }, []); 
+        fetchEvents(); // Call the fetch function
+    }, []); // Empty dependency array to run this effect only once on mount
 
-    return { invitations, error };
+    return { events, error }; 
 };

@@ -27,10 +27,10 @@ export function Login() {
 
       if (response.ok) {
         const result = await response.json();
-        setCookie('user', JSON.stringify({ id }), { path: '/', maxAge: 3600 });
+        setCookie('user', JSON.stringify({ id, password }), { path: '/', maxAge: 3600 });
 
         alert('Login successful!');
-        window.location.href = '/profile'; 
+        window.location.href = '/home'; 
       } else {
         const result = await response.json();
         alert('Login failed: ' + result.message);

@@ -1,19 +1,17 @@
-// import exp from 'constants';
 import { useState, useEffect } from 'react';
 import { Cookies } from 'react-cookie';
 
-export function useInvitations() {
+export function useUser() {
     const cookies = new Cookies();
     const user = cookies.get('user');
     
-    const [invitations, setInvitations] = useState([]); 
+    const [userData, setUserData] = useState([]);
     const [error, setError] = useState(null); 
-// app.get('/api/get_eventById/:event_id', async (req, res) => {
 
     useEffect(() => {
-        const fetchInvitations = async () => {
+        const fetchUser = async () => {
             try {
-                const apiUrl = process.env.REACT_APP_BACKEND_API + '/api/get_invitations/' + user.id;
+                const apiUrl = process.env.REACT_APP_BACKEND_API + '/api/get_userdata/' + user.id;
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
@@ -27,18 +25,18 @@ export function useInvitations() {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
 
-                const data = await response.json(); 
-                console.log(data);
-                setInvitations(data); 
+                const data = await response.json();
+                console.log("calling");
+                setUserData(data); 
 
             } catch (err) {
-                console.log("Could not fetch invitations", err);
+                console.log("Could not fetch user", err);
                 setError(err.message);
             }
         };
 
-        fetchInvitations(); 
-    }, []); 
+        fetchUser (); 
+    }, []);
 
-    return { invitations, error };
+    return { userData, error };
 };

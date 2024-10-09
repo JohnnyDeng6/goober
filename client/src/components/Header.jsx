@@ -5,8 +5,26 @@ export function Header() {
   const navigate = useNavigate()
 
   return (
-    <div className="text-center text-lg bg-slate-200 p-4 font-bold">
-      <button onClick={() => navigate('/')}>Goober</button>
-    </div>
+<div className="fixed top-0 w-full flex items-center justify-center bg-slate-200 font-bold p-3">
+  <button className="p-3 text-xl" onClick={() => navigate('/home')}>Goober</button>
+  
+  <div className="absolute right-0 flex space-x-4 mx-4">
+    {/* <button
+      className="p-3 hover:bg-slate-400 rounded"
+      onClick={() => navigate('/register')}
+    >
+      Register
+    </button>
+    <button
+      className="p-3 hover:bg-slate-400 rounded"
+      onClick={() => navigate('/login')}
+    >
+      Login
+    </button> */}
+  </div>
+</div>
+
+
+
   )
 }
