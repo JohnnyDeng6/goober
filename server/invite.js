@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 
-import { getInvitableUsers, insertInvitation } from './db.js';
+import { getEventById, getInvitableUsers, insertInvitation } from './db.js';
 
 let client;
 
@@ -20,7 +20,9 @@ export async function sendInvites(hostUser, numInvites, eventId) {
     let randomUsers = [];
 
     try {
-      await insertInvitation(hostUser.id, eventId, 't'); // host is auto invited & confirmed attending
+      const event = getEventById(eventId)
+      if (event.host_id != hostUser.id)
+        await insertInvitation(hostUser.id, eventId, 't'); // host is auto invited & confirmed attending
       randomUsers = await getInvitableUsers(hostUser.id, numInvites, eventId);
     } catch (err) {
       console.log("HELP " + err.toString());
@@ -40,7 +42,7 @@ export async function sendInvites(hostUser, numInvites, eventId) {
             + hostUser.description
             + '" and someone else with the description "'
             + user.description
-            + '" would you say that these people "match"? Reply "Yes." or "No".'
+            + '" would you say that these people would get along? Reply "Yes." or "No".'
         }],
         model: 'gpt-3.5-turbo',
       });
@@ -52,7 +54,9 @@ export async function sendInvites(hostUser, numInvites, eventId) {
         } catch (err) {
           console.log("err at thingy: " + err.toString());
         }
-      } else {console.log("chat said no :(")}
+      } else {
+        console.log(chatCompletion.choices[0].message.content)
+        console.log("chat said no :(")}
     }
 
     if (randomUsers.length > 0) {

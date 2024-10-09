@@ -2,7 +2,6 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export function Footer({ handleClick }) {
-  const navigate = useNavigate()
 
   return (
     <div className="fixed bottom-0 w-full bg-slate-300">

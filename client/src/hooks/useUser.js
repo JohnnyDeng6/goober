@@ -21,7 +21,7 @@ export function useUser() {
                 console.log(response)
 
 
-                if (!response.ok) { // Check if the response is OK (status in the range 200-299)
+                if (!response.ok) { 
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
 
@@ -35,7 +35,7 @@ export function useUser() {
             }
         };
 
-        fetchUser (); // Call the fetch function
+        fetchUser (); 
     }, []);
 
     return { userData, error };

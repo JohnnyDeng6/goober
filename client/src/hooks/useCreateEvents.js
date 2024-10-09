@@ -1,7 +1,6 @@
 
 import { Cookies } from 'react-cookie';
 
-//gets events
 export async function useCreateEvents(eventData) {
     const cookies = new Cookies();
     const user = cookies.get('user');
@@ -26,11 +25,11 @@ export async function useCreateEvents(eventData) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const data = await response.json(); // Parse the response data
+        const data = await response.json();
         console.log(data);
 
     } catch (err) {
-        console.log("Could not fetch events", err); // Log the error
+        console.log("Could not fetch events", err); 
         throw err;
     }
 

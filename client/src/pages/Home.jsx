@@ -3,7 +3,7 @@ import { Header, Footer, Invitations, Schedule, Event, Profile} from '../compone
 
 export function Home() {
 
-  const [clickedText, setClickedText] = useState("");
+  const [clickedText, setClickedText] = useState("Invitations");
 
   const handleClick = (event) => {
     const buttonText = event.target.innerText;
@@ -17,8 +17,8 @@ export function Home() {
         <Header />
       </header>
 
-      <main className="flex-grow flex items-center justify-center">
-        <span className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold p-4">
+      <main className="flex-grow flex items-center justify-center w-screen">
+        <span className="text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold p-4 w-screen">
 
           <div className={`${clickedText === "Invitations" ? "" : "hidden"}`}>
             <Invitations />

@@ -11,7 +11,7 @@ export function Profile() {
 
     const cookies = new Cookies(); 
     const user = cookies.get('user');
-    console.log(userData)
+    // console.log(userData)
 
     useEffect(() => {
         if (userData) {
@@ -34,8 +34,8 @@ export function Profile() {
             });
         }
     }, [UserData]);
-    console.log(UserData)
-    console.log(newUserData)
+    // console.log(UserData)
+    // console.log(newUserData)
 
     useEffect(() => {
         setSaved(JSON.stringify(UserData) === JSON.stringify(newUserData) ? true : false)

@@ -18,8 +18,6 @@ const PORT = 8000;
 
 async function authenticate(req, res, next) {
   try {
-      console.log(req.query.user)
-      console.log(req.query.pwd)
     if (await db.verifyLogin(req.query.user, req.query.pwd)) {
       next();
     } else {
@@ -106,15 +104,13 @@ app.post('/api/create_event', authenticate, async (req, res) => {
   const description = data.description;
   const time = data.time;
   const attendees = data.attendees;
-  console.log(req)
-  console.log(req.query.user)
 
   const host = {
     id: req.query.user,
     description: description
   }
 
-  const eventId = await db.insertEvent(description, host.id, time, attendees, 1);
+  const eventId = await db.insertEvent(description, host.id, time, attendees, 0);
 
   if (eventId) {
     res.status(200).send({
@@ -145,7 +141,6 @@ app.listen(PORT, () => {
 app.get('/api/get_invitations/:user_id', async (req, res) => {
     try {
       const user_id = req.params['user_id'];
-      console.log(user_id)
 
       const invitations = await db.getAllInvitations(user_id)
 
@@ -160,12 +155,10 @@ app.get('/api/get_invitations/:user_id', async (req, res) => {
 app.get('/api/get_userdata/:user_id', async (req, res) => {
     try {
       const user_id = req.params['user_id'];
-      console.log(user_id)
 
       const userData = await db.selectUser(user_id)
 
       // [{ id: .., name: .., desciption: .., password: .. }]
-      console.log(userData)
       res.send(userData)
 
     } catch (err) {
@@ -194,7 +187,6 @@ app.put('/api/edit_user/:user_id', async (req, res) => {
 app.get('/api/get_events/:user_id', async (req, res) => {
     try {
       const user_id = req.params['user_id'];
-      console.log(user_id)
 
       const events = await db.getAllEvents(user_id)
 
@@ -203,4 +195,51 @@ app.get('/api/get_events/:user_id', async (req, res) => {
     } catch (err) {
       res.status(500).send(err.toString());
     }
+})
+
+app.get('/api/get_eventById/:event_id', async (req, res) => {
+    try {
+      const event_id = req.params['event_id'];
+
+      const events = await db.getEventById(event_id)
+
+      res.send(events)
+
+    } catch (err) {
+      res.status(500).send(err.toString());
+    }
+})
+
+// '/api/reject_invitation?user=user_id&pwd=password&event=event_id
+app.delete('/api/reject_invitation', authenticate, async (req, res) => {
+  try {
+    const eventId = req.query.event;
+    db.deleteInvitationByEventId(eventId, req.query.user);
+    const host = db.selectUser(req.query.user)
+    const invitedUsers = await sendInvites(host, 1, eventId);
+    //find another user
+
+  } catch (err) {
+      res.status(500).send(err.toString());
+  }
+})
+
+app.put('/api/accept_invitation', authenticate, async (req, res) => {
+  try {
+    const eventId = req.query.event;
+    db.acceptInvitationByEventId(eventId, req.query.user);
+
+  } catch (err) {
+      res.status(500).send(err.toString());
+  }
+})
+//'/api/cancel_event?user=' + user.id + "&pwd=" + user.password + "&event=" + eventid;
+app.delete('/api/cancel_event', authenticate, async (req, res) => {
+  try {
+    const eventId = req.query.event;
+    db.cancelEvent(eventId, req.query.user);
+
+  } catch (err) {
+      res.status(500).send(err.toString());
+  }
 })

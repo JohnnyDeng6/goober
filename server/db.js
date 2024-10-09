@@ -79,9 +79,18 @@ export async function selectUser(userId) {
 export async function getAllInvitations(userId) { 
   try {
     const res = await client.query("SELECT * FROM invitations WHERE user_id = $1;", [userId]);
-    console.log(res.rows)
-    return res.rows;
-  }  catch (err) {
+
+    //merges event details into invitation
+    const invitationsWithEvents = await Promise.all(
+      res.rows.map(async (invitation) => {
+        const eventDetails = await getEventById(invitation.event_id); 
+        const { description, time, attendees, host_id, attendees_found } = eventDetails; 
+        return { ...invitation, description, time, attendees, host_id, attendees_found }; 
+      })
+    );
+
+    return invitationsWithEvents;
+  } catch (err) {
     console.log("Couldn't get Invitations from database");
     return undefined;
   }
@@ -128,10 +137,53 @@ export async function updateProfile(user_id, {name, description, password}) {
 export async function getAllEvents(userId) { 
   try {
     const res = await client.query("SELECT * FROM events WHERE host_id = $1;", [userId]);
-    console.log(res.rows)
     return res.rows;
   }  catch (err) {
     console.log("Couldn't get Invitations from database");
     return undefined;
   }
 }
+
+export async function getEventById(eventId) { 
+  try {
+    const res = await client.query("SELECT * FROM events WHERE id = $1;", [eventId]);
+    return res.rows[0];
+  }  catch (err) {
+    console.log("Couldn't get event from database");
+    return undefined;
+  }
+}
+
+
+export async function deleteInvitationByEventId(eventId, userId) {
+  try {
+    client.query("DELETE FROM invitations WHERE event_id = $1 AND user_id = $2", [eventId, userId])
+    client.query("UPDATE events SET attendees_found = attendees_found - 1 WHERE id = $1", [eventId])
+  } catch (err) {
+    console.error('Error in rejecting invitation:', err);
+  }
+}
+
+export async function acceptInvitationByEventId(eventId, userId) {
+  try {
+    client.query("UPDATE invitations SET confirmed = 't' WHERE event_id = $1 AND user_id = $2", [eventId, userId])
+    client.query("UPDATE events SET attendees_found = attendees_found + 1 WHERE id = $1", [eventId])
+  } catch (err) {
+    console.error('Error in rejecting invitation:', err);
+  }
+}
+
+export async function cancelEvent(eventId, userid) {
+  try {
+    const event = await client.query("SELECT * FROM events WHERE id = $1;", [eventId]);
+    if (event.host_id === userid) { //if user id host
+      client.query("DELETE FROM events WHERE event_id = $1", [eventId])
+    } else { //if user is attendee
+      deleteInvitationByEventId(eventId, userid);
+    }
+  } catch (err) {
+    console.error('Error in cancelling event:', err);
+
+  }
+}
+
