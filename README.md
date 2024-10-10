@@ -21,6 +21,7 @@ Goober is a hangout app that simplifies how people connect for spontaneous event
 
 - Node.js installed on your machine
 - A running instance of OpenAI API (with valid API keys)
+- .env file for both server (OPEN_AI_KEY, PSQL_USR, PSQL_PD) and client (REACT_APP_BACKEND_API)
 
 To start, please cd into the `scripts` folder and run:
 
