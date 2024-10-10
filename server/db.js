@@ -160,7 +160,9 @@ export async function getEventById(eventId) {
 export async function deleteInvitationByEventId(eventId, userId) {
   try {
     client.query("DELETE FROM invitations WHERE event_id = $1 AND user_id = $2", [eventId, userId])
-    client.query("UPDATE events SET attendees_found = attendees_found - 1 WHERE id = $1", [eventId])
+    if ((client.query("SELECT FROM invitations WHERE user_id = $1 AND event_id = $2", [userId, eventId])).rows[0].confirmed === 't') {
+      client.query("UPDATE events SET attendees_found = attendees_found - 1 WHERE id = $1", [eventId])
+    }
   } catch (err) {
     console.error('Error in rejecting invitation:', err);
   }
