@@ -215,7 +215,11 @@ app.delete('/api/reject_invitation', authenticate, async (req, res) => {
   try {
     const eventId = req.query.event;
     db.deleteInvitationByEventId(eventId, req.query.user);
-    const host = db.selectUser(req.query.user)
+    console.log(req.query.user)
+    const host = await db.getHostByEventId(eventId)
+    // console.log(host.id)
+    // console.log(host.description)
+    // console.log(eventId)
     const invitedUsers = await sendInvites(host, 1, eventId);
     //find another user
 

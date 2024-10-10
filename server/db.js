@@ -2,6 +2,7 @@ import pg from 'pg';
 const { Client } = pg;
 import dotenv from 'dotenv';
 dotenv.config();
+import { sendInvites } from './invite.js';
 
 
 const client = new Client({
@@ -69,6 +70,7 @@ export async function selectUser(userId) {
   try {
     const res = await client.query("SELECT * FROM users WHERE id = $1", [userId]);
 
+    console.log(res.rows[0])
     return res.rows[0];
   } catch (err) {
     console.log("Fail: " + err.toString());
@@ -176,10 +178,16 @@ export async function acceptInvitationByEventId(eventId, userId) {
 export async function cancelEvent(eventId, userid) {
   try {
     const event = await client.query("SELECT * FROM events WHERE id = $1;", [eventId]);
-    if (event.host_id === userid) { //if user id host
-      client.query("DELETE FROM events WHERE event_id = $1", [eventId])
+    // console.log(event.rows[0].host_id)
+    // console.log(userid)
+    if (event.rows[0].host_id == userid) { //if user id host
+      client.query("DELETE FROM invitations WHERE event_id = $1", [eventId])
+      client.query("DELETE FROM events WHERE id = $1", [eventId])
     } else { //if user is attendee
+      console.log("not host")
       deleteInvitationByEventId(eventId, userid);
+      const host = await getHostByEventId(eventId)
+      await sendInvites(host, 1, eventId);
     }
   } catch (err) {
     console.error('Error in cancelling event:', err);
@@ -187,3 +195,15 @@ export async function cancelEvent(eventId, userid) {
   }
 }
 
+export async function getHostByEventId(eventId) {
+  try {
+    const event = await client.query("SELECT * FROM events WHERE id = $1;", [eventId]);
+    const hostId = event.rows[0].host_id;
+    const host = selectUser(hostId);
+    return host;
+
+  } catch (err) {
+    console.error('Error getting HostId:', err);
+  }
+
+}
