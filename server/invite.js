@@ -46,6 +46,7 @@ export async function sendInvites(hostUser, numInvites, eventId) {
         }],
         model: 'gpt-3.5-turbo',
       });
+      console.log(chatCompletion.choices[0].message.content)
 
       if (chatCompletion.choices[0].message.content === "Yes.") {
         try {
@@ -55,7 +56,6 @@ export async function sendInvites(hostUser, numInvites, eventId) {
           console.log("err at thingy: " + err.toString());
         }
       } else {
-        console.log(chatCompletion.choices[0].message.content)
         console.log("chat said no :(")}
     }
 
