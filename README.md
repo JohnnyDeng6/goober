@@ -38,3 +38,35 @@ When changing the `setup/schema.sql` file, please run:
 - `./setup_pg.sh`
 
 Which will drop the `goober` database and set it up again.
+
+
+## Running the Client Application with a Remote Server
+
+
+To run the application locally, follow these steps:
+
+1. **Navigate to the Client Directory**  
+   Open your terminal and run the following command to change to the client directory:  
+   ```bash
+   cd client
+   ```
+
+2. **Create a `.env` File**  
+   In the `client` directory, create a file named `.env` and paste the following line into it:  
+   `REACT_APP_BACKEND_API=http://goober.jzydeng.com:8003`
+
+3. **Install Dependencies and Start the Application**  
+   Run the following command to install the necessary dependencies:  
+   ```bash
+   npm install
+   npm start
+   ```
+
+4. **Log in with these credentials:**
+
+   Usernames: `bicwang`, `micahdb`, `nakulbansal727`, `simon` 
+   Password: `1234` (for all accounts)
+   
+Your application should now be running locally, and it connected to an extern server.
+Passwords you can you are 
+
